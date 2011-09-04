@@ -1,0 +1,217 @@
+@import url(http://fonts.googleapis.com/css?family=Rationale|Ubuntu:400,500,700)  
+@import _mixins.sass
+  
+html, body
+  :overflow hidden
+body
+  :font-family Ubuntu
+  :color #333
+ 
+$color: #00a6ff
+
+.download
+  +linear_gradient(darken($color,10%),darken($color,20%))
+  +box-shadow(0,2px,5px,rgba(0,0,0,0.5))
+  +border-radius(5px)
+  :width 200px
+  :text-align center
+  :color #eee
+  :padding 10px 0
+  :margin 40px auto
+    :bottom 20px
+  .title
+    :font-size 20px
+  .version
+    :font-size 12px
+
+a
+  :color $color
+  :text-decoration none
+  :padding-bottom 2px
+  :border-bottom 2px dashed $color
+  
+.social
+  :padding-top 20px
+  a
+    :border none
+a:visited
+  :color darken($color,10%)
+em
+  :color complement($color)
+b, i
+  :color $color
+  :font-weight normal
+  
+dl
+  :margin-bottom 30px
+  dd
+    :margin-left 20px
+  dt
+    :margin
+      :top 15px
+      :bottom 5px
+    span
+      :color #999
+
+ul
+  :list-style none
+  :padding 0
+  :margin 0
+  
+nav
+  :border-bottom 4px solid #aaa
+  li
+    :float left
+    :position relative
+    :right 50%
+    
+  ul
+    :float left
+    :position relative
+    :left 50%
+  ul
+    :margin 12px
+  :position fixed
+  +linear-gradient(#333,#222)
+  :background-color #333
+  :top 0
+  :height 50px
+  :left 0
+  :right 0
+  :z-index 10
+  li
+    :margin-right 30px
+    a
+      :color #eee
+      :border none
+      &:visited
+        :color #ccc
+
+=webkit-scrollbar-minimal($tackColor: #aaa,$trackPieceColor:#333,$borderRadius:6px,$width:12px)
+  &::-webkit-scrollbar
+    :height $width
+    :width $width
+  &::-webkit-scrollbar-button:start:decrement &::-webkit-scrollbar-button:end:increment
+    :display none
+  &::-webkit-scrollbar-track-piece
+    :background-color $tackColor
+  &::-webkit-scrollbar-thumb:vertical
+    :background-color $trackPieceColor
+    :-webkit-border-radius $borderRadius
+
+article
+  :position fixed
+  :background-color #ddd
+  :top 54px
+  :left 0
+  :bottom 0
+  :right 0
+  :overflow scroll
+  :height 100%
+  +webkit-scrollbar-minimal()
+code
+  :display block
+  :background-color #333
+  :border 1px solid #444
+    :bottom 1px solid #666
+  +border-radius(5px)
+  :color #eee
+  :width 100%
+  pre
+    :font-size 14px
+    :padding 0 15px
+    :line-height 16px
+  :font-size 14px
+  :margin 10px auto
+
+h1, h2, h3, h4
+  :font-weight normal
+  :color #333
+  :margin 0
+
+h3
+  :font-size 40px
+  :margin 0 5%
+  :font-family Rationale
+p
+  :margin 10px 0
+  :line-height 24px
+h4
+  :font-size 24px
+  :margin-top 15px
+  :padding-bottom 5px
+  :border-bottom 1px dashed #ccc
+.clear
+  :clear both
+.column
+  :margin 20px 4%
+    :top 0
+  :padding 1%
+    :top 0
+  :width 40%
+  :float left
+  &:nth-child(odd)
+    :margin-left 0
+    :width 42%
+  &:nth-child(even)
+    :width 42% 
+section#top
+  .column.logo
+    :width 20%
+    :margin-left 22%
+  .column.center
+    :width 20%
+    :margin-right 22%
+    :margin-top 30px
+    :font-size 18px
+    p
+      :text-align center
+  code
+    :margin-top 40px
+    :width 60%
+    :margin 0 auto
+  p.definition
+    :text-align center
+    :line-height 32px
+    :color #444
+    :padding 30px 25%
+    :font-size 20px
+    :background-color #ddd
+    :background-color rgba(0,0,0,0.05)
+    :margin 0
+    :border-top 1px dashed #bbb
+    :border-bottom 1px dashed #bbb
+  h1, h2
+    :text-shadow 0px 1px 0px #fff 
+  h1
+    img
+      :vertical-align bottom
+    :padding-top 40px
+    :font-family Rationale
+    :text-align center
+    :font-size 128px
+    :line-height 120px
+  h2
+    :padding-bottom 20px
+    :padding-top 20px
+    :text-align center
+    :font-size 24px
+  h2.second
+    :padding 30px 0
+      :bottom 15px
+.bottom
+  :height 80px
+  :text-align center 
+  :color #aaa
+  :font-size 14px
+  :padding-top 15px
+section
+  +linear-gradient(#f2f2f2,#efefef)
+  :border-bottom 2px dashed #ccc
+  :float left
+  :padding-top 20px
+  :min-height 100%
+  :width 100%    
+  &.last
+    :min-height 200px
+    :padding-bottom 20px

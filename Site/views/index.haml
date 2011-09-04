@@ -1,0 +1,505 @@
+!!! 5
+%html
+  %head
+    %title  
+      Stash
+    %link{:href => "/normalize.css", :rel => "stylesheet", :type => "text/css"}
+    %link{:href => "/style.css", :rel => "stylesheet", :type => "text/css"}
+    %link{:href => "/hightligher.css", :rel => "stylesheet", :type => "text/css"}
+    %script{:src => "/mootools-core-1.3.1-full-compat-yc.js", :type => "text/javascript"}
+    %script{:src => "/mootools-more-1.3.2.1.js", :type => "text/javascript"}
+    %script{:src => "/site.js", :type => "text/javascript"}
+    %script{:src => "/prettify.js", :type => "text/javascript"}
+  %body
+    %header
+      %nav{:role => "navigation"}
+        %ul
+          %li
+            %a{:href => "#top"}
+              Top
+          %li
+            %a{:href => "#usage"}
+              Usage
+          %li
+            %a{:href => "#docs"}
+              Documentation
+          %li
+            %a{:href => "#use"}
+              Use Cases
+          %li
+            %a{:href => "#getinvolved"}
+              Get Involved
+          %ul
+    %article#content
+      %a{:name=>"top"}
+      %section#top
+        .column.logo
+          %h1
+            Stash
+          %h2
+            Stash your JavaScript!
+        .column.center
+          %a{:href=>"https://github.com/gdotdesign/stash/zipball/master"}
+            .download
+              .title
+                Download Stash
+              .version
+                0.8 - Alpha
+          %p
+            You can download 
+            %b Stash
+            with the button or at
+            %a{:href=>"https://github.com/gdotdesign/stash"} Github
+        .clear
+        %p.definition
+          Stash  helps you define your 
+          %em objects
+          and
+          %em properties
+          in a clean manner, with support for 
+          %em dependecies, 
+          function running,
+          %em namespaces 
+          and feature detection.
+        %h2.second
+          The Showdown
+        %code
+          %pre.prettyprint
+            :plain
+              # When the CanvasDrawer is defined and if there is browser support: InitCanvas
+              define ['CanvasDrawer',!!document.createElement('canvas').getContext], '^ InitCanvas', ->
+                new @CanvasDrawer 200, 200
+              
+              # define CanvasDrawer class  
+              define 'CanvasDrawer', ->
+                class CanvasDrawer
+                  constructor: (width,height) ->
+                    canvas = document.createElement 'canvas'
+                    canvas.width = width
+                    canvas.height = height
+                    
+                    document.body.appendChild canvas
+                    
+                    ctx = canvas.getContext "2d"
+                    ctx.fillStyle = "rgb(200,0,0)"
+                    ctx.fillRect 10, 10, 55, 50
+                    ctx.fillStyle = "rgba(0, 0, 200, 0.5)"
+                    ctx.fillRect 30, 30, 55, 50
+      .clear
+      %a{:name=>"usage"}
+      %section
+        %h3
+          Usage
+        .column
+          %h4
+            Basic
+          %p
+            Define dependecies in the first argument, the property you want to create in the second and the value you want it to have in third! The dependecy argument is optional.
+          %p
+            Example: if 
+            %i myProperty
+            exists on the context, initialize 
+            %i myOtherProperty
+            with the value 
+            %em Hey There!
+          %code
+            %pre.prettyprint
+              :escaped
+                define 'myProperty', 'myOtherProperty', 'Hey There!'
+          %p 
+            You can pass a 
+            %i path
+            to the second argument. All of the objects required will be created.
+          %code
+            %pre.prettyprint
+              :escaped
+                define 'Stuff.Things.Small.trinket', 'Yey!'
+          %p The code above is the same as:
+          %code
+            %pre.prettyprint
+              :escaped
+                Stuff = {}
+                Stuff.Things = {}
+                Stuff.Things.Small = {}
+                Stuff.Things.Small.trinket = 'Yey!'
+          %p You can use a functions return value as the value for the property.
+          %p
+            Example: 
+            %i Person
+            uses the previously defined property
+            %i greetings.
+          %code
+            %pre.prettyprint
+              :escaped
+                define 'greetings', 'Hello '
+                define 'greetings', 'person', ->
+                  @greetings+"John!"
+                #@person will be "Hello John!"
+          %p
+            The order of the definitions doesn't matter, because 
+            %i Stash
+            auto loads the porperties.
+          %p 
+            That means when a definition is processed it checks for dependecies and if they are not satisfied the definition gets 
+            %em stashed.
+          %p 
+            Every time a definition is loaded, all the stashed definitions are reprocessed. This way the example below will return the same result as the previous one.
+          %code
+            %pre.prettyprint
+              :escaped
+                define 'greetings', 'person', ->
+                  @greetings+"John!"
+                define 'greetings', 'Hello '
+                #@person will be "Hello John!"
+          %h4
+            Advanced
+          %p
+            When using a custom context, Stash will look for the the dependecies provided in
+            %em that context
+            , and also the properties will be created there if you didn't specified otherwise.
+          %code
+            %pre.prettyprint
+              :escaped
+                prop = 'hey'
+                contextObject = 
+                  property: 'thing'
+                stash = new Stash {context:contextObject}
+                define ['property','prop'], 'property2', 'that'
+                # property2 is undefined because there is no contextObject.prop
+                define ['property'], 'property2', 'that'
+                contextObject.property2 == 'that' # true
+        .column
+          %h4
+            Functions
+          %p
+            You can run a function instead of defining a property. To do that you need to prefix the name with a 
+            %b ^
+            , in this case the name serves no useful purpose, it's just for identification.
+          %p
+            Example: Monkey patch the already defined Element object (MooTools).
+          %code
+            %pre.prettyprint
+              :escaped
+                define 'Element', '^ Element monkey patch', ->
+                  Element.implement
+                    opaque: ->
+                      @setStyle 'opacity', 0 
+          %h4
+            Feature Detection
+          %p
+            You can pass the 
+            %em define
+            method an expression that returns 
+            %i true
+            or
+            %i false
+            as the first argument. So you can use it for detecting HTML and Javascript features.
+          %p
+            Example: Only define the 'TheThing' if it is in node.js
+          %code
+            %pre.prettyprint
+              :escaped
+                define (!window? and exports?), 'TheThing', 'Is Big!'
+          %h4
+            Checking global objects
+          %p
+            Sometimes you need to check for a property on the
+            %i global
+            scope, like in the example below: We want to define the alert function if we have a Warning method on the glob (global scope), to check for it we use the
+            %b !
+            prefix. By default the global scope is the 
+            %em window
+            if it is in the browser or the 
+            %a{:href=>"http://nodejs.org/docs/v0.4.9/api/globals.html#global"} gobal 
+            object if it is in node.js.
+          %code
+            %pre.prettyprint
+              :escaped
+                glob =
+                  Warning: (message)->
+                    console.log (msg = "Warning: \#{message} !")
+                    msg
+                myobj = {
+                  warn: true
+                }
+                stash = new Stash {context:myobj, global: glob}
+                stash.define ['!Warning','warn'], 'Alert', ->
+                  (message) =>
+                    if @warn
+                      glob.Warning message
+          %h4
+            Checking local objects while using a prefix
+          %p
+            By default while using a prefix, Stash looks for "Prefix.dependecy". To check for a property on the local context whitout 
+            %em Prefix,
+            prefix the dependecy with the
+            %i @.
+          %code
+            %pre.prettyprint
+              :escaped
+                c = 
+                  local: true
+                loader = new Stash {context:c, prefix:'Stash'}
+                loader.define 'local', 'UnitA', 0
+                # c.Stash.UnitA is undefined because
+                # stash looks for c.Stash.local
+                # to look for c.local use @local instead
+                loader.define '@local', 'UnitA', 0
+                # c.Stash.UnitA is now 0
+      .clear     
+      %a{:name=>"docs"}
+      %section
+        %h3 
+          Doucmentation
+        .column
+          %h4
+            Constructor
+          %p
+            Creates a new Stash instance.
+          %code
+            %pre.prettyprint
+              :escaped
+                stash = new Stash {context: window, prefix:"", verbose:false, global: window}
+          %dl
+            %dt
+              %b context
+              %span (Object)
+            %dd
+              The 
+              %em Object
+              which to add the properties and sub objects. Defaults to 
+              %i window
+              if used in the browser or 
+              %i global 
+              if used in node.js.
+            %dt
+              %b global
+              %span (Object)
+            %dd
+              The 
+              %em Object
+              which refers to the global scope (window, exports, global). Defaults to 
+              %i window
+              if used in the browser or 
+              %i global 
+              if used in node.js.
+            %dt
+              %b prefix
+              %span (String)
+            %dd
+              The prefix to add to the properties namespace. (Prefix.property)
+            %dt
+              %b verbose
+              %span (Boolean)
+            %dd  
+              Print out the proccess in the console. (Stashing, Running, Loading)
+            %dt
+              %b autoLoad
+              %span (Boolean)
+            %dd  
+              Auto load the porperty on 
+              %em define
+              if true or stash it if it's false.
+          %h4
+            stash.check
+          %p
+            Checks a stashed property dependecies. 
+            %i True
+            if it can be defined or
+            %i false
+            if it's not.
+          %code
+            %pre.prettyprint
+              :escaped
+                stash.check name
+          %dl
+            %dt
+              %b name
+              %span (String)
+            %dd
+              Name of the stashed property. 
+        .column
+          %h4
+            stash.define
+          %p
+            Defines a property on the context.
+          %code
+            %pre.prettyprint
+              :escaped
+                stash.define dependencies*, objectPath, value
+          %dl
+            %dt
+              %b dependecies
+              %span (String, Expression or Array)
+            %dd
+              %ul
+                %li String: Name or path 
+                %li
+                  Expression: An expression with a return value of 
+                  %em true
+                  or 
+                  %em false
+                %li Array of Strings and Expressions
+            %dt
+              %b objectPath
+              %span (String)
+            %dd
+              The variable name or path. If it's a name it will add it as a property to the current context, if it's a path it will create the neccessery objects.
+            %dt
+              %b value
+              %span
+            %dd
+              Any valid javascript value (String, Object, Array, etc...), or a function. If it is a function it will run that function on the current context whitout any arguments (function.call context).
+            %p
+              * optional
+          %h4
+            stash.load
+          %p
+            Loads a stashed property, if it can be defined (stash.check).
+          %code
+            %pre.prettyprint.lang-coffee
+              :escaped
+                stash.load name, checkStash
+          %dl
+            %dt
+              %b name
+              %span (String)
+            %dd
+              Name of the stashed property. 
+            %dt
+              %b checkStash
+              %span (Boolean)
+            %dd
+              To recheck the other stashed properties or not.
+          %h4
+            stash.loadWithDependecies
+          %p
+            Loads a stashed property and all of it's dependecies. It doesn't load any properties if any of the dependecies can't be defined.
+          %code
+            %pre.prettyprint.lang-coffee
+              :escaped
+                stash.loadWithDependecies name
+          %dl
+            %dt
+              %b name
+              %span (String)
+            %dd
+              Name of the stashed property. 
+      .clear
+      %a{:name=>"use"}
+      %section
+        %h3 
+          Use Cases
+        .column
+          %h4
+            When to use
+          %p
+            When you want clean dependecies in you app.
+          %code
+            %pre.prettyprint
+              :escaped
+                define 'ClassB', 'ClassA', ->
+                  class ClassA extends ClassB
+                    # stuff
+                define 'ClassB'
+                  class ClassB 
+                    # stuff
+          %p
+            When you want to use namespaces in you app.
+          %code
+            %pre.prettyprint
+              :escaped
+                define "Core.Abstract", "Buttons.Abstract", ->
+                  new Class
+                    Extends: Core.Abstract
+                define "Buttons.Abstract","Buttons.Toggle", ->
+                  new Class
+                    Extends: Buttons.Abstract
+          %p
+            When your app is in many files, and you just want to concat them into a single one, and you don't want to worry about the order which they are loaded.
+          %code
+            %pre.prettyprint
+              :escaped  
+                # the files are concated in this order
+                # Source/Buttons/Toggle.coffee
+                define "Buttons.Abstract","Buttons.Toggle", ->
+                  new Class
+                    Extends: Buttons.Abstract
+                # Source/Buttons/Abstract.coffee
+                define "Core.Abstract", "Buttons.Abstract", ->
+                  new Class
+                    Extends: Core.Abstract
+                # Source/Core/Abstract.coffee
+                define "Core.Abstract", ->
+                  new Class
+        .column
+          %p
+            When you want namespace independent apps (Prefix).
+          %code
+            %pre.prettyprint
+              :escaped
+                stash = new Stash {prefix: 'Lattice'}
+                stash.define "Core.Abstract", "Buttons.Abstract", ->
+                  new Class
+                    Extends: @Core.Abstract
+                stash.define "Core.Abstract", ->
+                  new Class
+                # will produce
+                # Lattice.Core.Abstract
+                # Lattice.Buttons.Abstract
+          %h4
+            How
+            %em NOT 
+            to use
+          %p 
+            Stash can't monitor properties that are not initialized with 
+            %em define.
+          %code
+            %pre.prettyprint
+              :escaped
+                obj = {}
+                stash = new Stash {context:obj}
+                stash.define 'prop', 'property1', true
+                obj.prop = 'load dammit!'
+                # obj.property1 won't load because
+                # obj.prop it isn't defined with define
+          %p 
+            Stash won't load properties which have unresolved dependecies (undefined).
+          %code
+            %pre.prettyprint
+              :escaped
+                obj =
+                  prop: undefined
+                stash = new Stash {context:obj}
+                stash.define 'prop', 'property1', true
+      .clear
+      %a{:name=>"getinvolved"}
+      %section.last
+        %h3 Get Involved
+        .column
+          %h4 Contribute
+          %p
+            You have any ideas or found any bugs post them on
+            %a{:href=>"https://github.com/gdotdesign/stash/issues"} github issues.
+          %p 
+            If you want to work on 
+            %b Stash
+            you are free to do so (fork it and have at it), just follow the guidelines on 
+            %a{:href=>"https://github.com/gdotdesign/stash"} github.
+        .column
+          %h4 Spread the word!
+          %p
+            If you think this project is good tell other people about it on twitter, facebook or any anywhere you like.
+          %h4 Stay in touch!
+          %p
+            Follow me on Twitter, Facebook or Google+ for updates on Stash and my other projects.
+          %p.social
+            %a{:href=>"http://www.facebook.com/gdotdesign"}
+              %img{:src=>"/facebook.png"}
+            %a{:href=>"https://plus.google.com/114191199845268458674/posts"}
+              %img{:src=>"/gplus.png"}
+            %a{:href=>"https://twitter.com/#!/gdotdesign"}
+              %img{:src=>"/twitter.png"}
+      .clear
+      .bottom
+        gdotdesign - Szikszai Gusztáv 2011              
